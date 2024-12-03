@@ -49,6 +49,8 @@ void adicionarContato()
   printf("Digite o telefone: ");
   scanf("%s", telefone);
 
+  clock_t start = clock();
+
   unsigned int index = hash(nome);
   HashNode *new_node = (HashNode *)malloc(sizeof(HashNode));
   new_node->nome = strdup(nome);
@@ -56,7 +58,9 @@ void adicionarContato()
   new_node->next = table->buckets[index];
   table->buckets[index] = new_node;
 
-  printf("Contato adicionado!!\n");
+  clock_t end = clock();
+
+  printf("Contato adicionado!! (tempo de adição: %.5f ms\n", ((double)(end - start) / CLOCKS_PER_SEC) * 1000);
 }
 
 void buscarContato()
@@ -65,17 +69,21 @@ void buscarContato()
   printf("Digite o nome para buscar: ");
   scanf("%s", nome);
 
+  clock_t start = clock();
+
   unsigned int index = hash(nome);
   HashNode *node = table->buckets[index];
   while (node)
   {
     if (strcmp(node->nome, nome) == 0)
     {
-      printf("Telefone encontrado: %s\n", node->telefone);
+      clock_t end = clock();
+      printf("Telefone encontrado: %s. Tempo de busca: %.5f ms\n", node->telefone, ((double)(end - start) / CLOCKS_PER_SEC) * 1000);
       return;
     }
     node = node->next;
   }
+
   printf("Contato não encontrado.\n");
 }
 
