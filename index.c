@@ -52,6 +52,29 @@ void adicionarContato()
   clock_t start = clock();
 
   unsigned int index = hash(nome);
+  HashNode *node = table->buckets[index];
+
+  // Verifica se o nome já existe
+  while (node)
+  {
+    if (strcmp(node->nome, nome) == 0)
+    {
+      // Adiciona o novo telefone como um novo nó
+      HashNode *new_node = (HashNode *)malloc(sizeof(HashNode));
+      new_node->nome = strdup(nome);
+      new_node->telefone = strdup(telefone);
+      new_node->next = table->buckets[index];
+      table->buckets[index] = new_node;
+
+      clock_t end = clock();
+      printf("Novo telefone adicionado para o contato '%s'! (tempo de adição: %.5f ms)\n",
+             nome, ((double)(end - start) / CLOCKS_PER_SEC) * 1000);
+      return;
+    }
+    node = node->next;
+  }
+
+  // Caso o nome não exista, cria um novo contato
   HashNode *new_node = (HashNode *)malloc(sizeof(HashNode));
   new_node->nome = strdup(nome);
   new_node->telefone = strdup(telefone);
@@ -59,8 +82,8 @@ void adicionarContato()
   table->buckets[index] = new_node;
 
   clock_t end = clock();
-
-  printf("Contato adicionado!! (tempo de adição: %.5f ms\n", ((double)(end - start) / CLOCKS_PER_SEC) * 1000);
+  printf("Contato '%s' adicionado com sucesso! (tempo de adição: %.5f ms)\n",
+         nome, ((double)(end - start) / CLOCKS_PER_SEC) * 1000);
 }
 
 void buscarContato()
@@ -73,18 +96,25 @@ void buscarContato()
 
   unsigned int index = hash(nome);
   HashNode *node = table->buckets[index];
+  int found = 0;
+
+  printf("Telefones associados a '%s':\n", nome);
   while (node)
   {
     if (strcmp(node->nome, nome) == 0)
     {
-      clock_t end = clock();
-      printf("Telefone encontrado: %s. Tempo de busca: %.5f ms\n", node->telefone, ((double)(end - start) / CLOCKS_PER_SEC) * 1000);
-      return;
+      printf("- %s\n", node->telefone);
+      found = 1;
     }
     node = node->next;
   }
 
-  printf("Contato não encontrado.\n");
+  clock_t end = clock();
+  if (!found)
+  {
+    printf("Contato não encontrado.\n");
+  }
+  printf("Tempo de busca: %.5f ms\n", ((double)(end - start) / CLOCKS_PER_SEC) * 1000);
 }
 
 void removerContato()
